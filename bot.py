@@ -6,6 +6,7 @@ from database  import Database
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import gismeteoParser
 
 API = API_TOKEN
 
@@ -36,7 +37,7 @@ async def command_help(message: types.Message):
 
 @dp.message_handler(commands=['city'])
 async def command_city(message: types.Message):
-	msg = "Напишите город для отображения погоды"
+	msg = "Напишите город для отображения погоды."
 	await message.answer(msg)
 	await Form.city.set()
 
@@ -46,16 +47,16 @@ async def command_set_city(message: types.Message, state: FSMContext):
 	msg = message.text
 	if(not db.user_exists(message.from_user.id)):
 		db.set_city(message.from_user.id, msg)
-		await message.answer("Вы добавлены в базу данных!")
+		await message.answer("Ваши данные внесены!")
 		await state.finish()
 	else:
-		await message.answer("Вы уже в базе данных.\nИспользуйте комманду /update, чтобы обновить город.")
+		await message.answer("Вы уже вносили свои данные.\nИспользуйте комманду /update, чтобы обновить город.")
 		await state.finish()
 
 
 @dp.message_handler(commands=['update'])
 async def command_update(message: types.Message):
-	msg = "Напишите на какой город вы хотите заменить текущий"
+	msg = "Напишите на какой город вы хотите заменить текущий."
 	await message.answer(msg)
 	await Form.update.set()
 
@@ -65,7 +66,7 @@ async def command_update_city(message: types.Message, state: FSMContext):
 	msg = message.text
 	if(not db.user_exists(message.from_user.id)):
 		db.set_city(message.from_user.id, msg)
-		await message.answer("Вы добавлены в базу данных!")
+		await message.answer("Ваши данные внесены!")
 		await state.finish()
 	else:
 		db.update_city(message.from_user.id, msg)
@@ -73,8 +74,14 @@ async def command_update_city(message: types.Message, state: FSMContext):
 		await state.finish()
 
 
-"""@dp.message_handler(commands=['getweather'])
-async def command_getweather(message: types.Message):"""
+@dp.message_handler(commands=['getweather'])
+async def command_getweather(message: types.Message):
+	if(db.user_exists(message.from_user.id)):
+		city = db.get_city(message.from_user.id)
+		msg = gismeteoParser.parse(city)
+		await message.answer(msg)
+	else:
+		await message.answer("Для начала выберете город.")
 
 
 if __name__ == '__main__':

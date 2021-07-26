@@ -24,5 +24,11 @@ class Database:
 			return self.cursor.execute("UPDATE cities_users SET city = ? WHERE id = ?", (city, user_id))
 
 
+	def get_city(self, user_id):
+		with self.connection:
+			result = self.cursor.execute("SELECT city FROM cities_users WHERE id = ?", (user_id, )).fetchall()
+			return result[0][0]
+
+
 	def close(self):
 		self.connection.close()
