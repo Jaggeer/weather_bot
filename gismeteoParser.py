@@ -34,7 +34,7 @@ def get_content(r):
 	wind_list = list(wind_nonformat)
 	wind = ''
 	for i in wind_list:
-		if i == 'м' or i == 'С' or i == 'Ю' or i == 'ш':
+		if i == 'м' or i == 'С' or i == 'Ю' or i == 'ш' or i == 'с' or i == 'з' or i == 'ю' or i == 'в':
 			wind = wind + f' {i}'
 		elif i == 'р':
 			wind = wind + f'{i} '
